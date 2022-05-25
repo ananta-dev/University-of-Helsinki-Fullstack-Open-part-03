@@ -1,19 +1,15 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 
-if (process.argv.length < 3) {
-    console.log(
-        "Please provide the password as an argument: node mongo.js <password>"
-    );
-    process.exit(1);
-}
+// if (process.argv.length < 2) {
+//     console.log(
+//         "Please provide the password as an argument: node mongo.js <password>"
+//     );
+//     process.exit(1);
+// }
+// const password = process.argv[2];
 
-const password = process.argv[2];
-
-// const url = `mongodb+srv://fullstack:${password}@cluster0.o1opl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-// const url = `mongodb+srv://fullstack:9S5bB5QQLe3y1987@cluster0.o1opl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-const url = `mongodb+srv://fullstack:${password}@cluster0.fljdt.mongodb.net/phonebookApp?retryWrites=true&w=majority`;
-
-mongoose.connect(url);
+mongoose.connect(process.env.MONGODB_URL);
 
 const personSchema = new mongoose.Schema({
     name: String,
@@ -22,7 +18,7 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model("Person", personSchema);
 
-if (process.argv.length === 3) {
+if (process.argv.length === 2) {
     console.log("phonebook:");
     Person.find({}).then(result => {
         result.forEach(person => {
@@ -30,10 +26,10 @@ if (process.argv.length === 3) {
         });
         mongoose.connection.close();
     });
-} else if (process.argv.length === 5) {
+} else if (process.argv.length === 4) {
     const person = new Person({
-        name: process.argv[3],
-        number: process.argv[4],
+        name: process.argv[2],
+        number: process.argv[3],
     });
     person.save().then(result => {
         console.log("Person saved!");
