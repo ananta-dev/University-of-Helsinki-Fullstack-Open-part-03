@@ -1,0 +1,46 @@
+{
+  "persons": [
+    {
+      "name": "Arto Hellas",
+      "number": "333333333",
+      "id": 1
+    },
+    {
+      "name": "Ada Lovelace",
+      "number": "39-44-5323523",
+      "id": 2
+    },
+    {
+      "name": "Mary Poppendieck",
+      "number": "39-23-6423122",
+      "id": 4
+    },
+    {
+      "name": "Maru",
+      "number": "07936575973",
+      "id": 6
+    },
+    {
+      "name": "Juanjo Guirao",
+      "number": "1111111111",
+      "id": 7
+    }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "title": "json-server",
+      "author": "typicode"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}

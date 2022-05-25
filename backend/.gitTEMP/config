@@ -1,0 +1,13 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "github"]
+	url = https://github.com/freenrg/Fullstack-Open-part-03.git
+	fetch = +refs/heads/*:refs/remotes/github/*
+[remote "heroku"]
+	url = https://git.heroku.com/univ-helsinki-phonebook.git
+	fetch = +refs/heads/*:refs/remotes/heroku/*

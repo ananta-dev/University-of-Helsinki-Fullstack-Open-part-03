@@ -1,0 +1,3 @@
+.gitTEMP contains a git repository used to deploy backend (plus frontend build) to Heroku.
+I am temporarily disabling it to push the whole code (frontend and backend) in the parent directory to github.
+If you want to deploy backend (plus frontend build) to Heroku, change the name to .git
