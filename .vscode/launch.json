@@ -5,12 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/backend/index.js",
+            "request": "launch",
+            "skipFiles": ["<node_internals>/**"],
+            "type": "node",
+            "env": {
+                "MONGODB_URL": "mongodb+srv://fullstack:AJHaskjh187631jhkjgha192839@cluster0.fljdt.mongodb.net/noteApp?retryWrites=true&w=majority"
+            }
+        },
+        {
             "type": "pwa-node",
             "request": "launch",
             "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "program": "${file}"
         }
     ]
