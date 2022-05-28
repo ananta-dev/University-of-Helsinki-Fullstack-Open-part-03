@@ -14,12 +14,12 @@ const personSchema = new mongoose.Schema({
     number: String,
 });
 
-// personSchema.set("toJSON", {
-//     transform: (document, returnedObject) => {
-//         returnedObject.id = document._id;
-//         delete returnedObject._id;
-//         delete returnedObject.__v;
-//     },
-// });
+personSchema.set("toJSON", {
+    transform: (document, returnedObject) => {
+        returnedObject.id = document._id;
+        delete returnedObject._id;
+        delete returnedObject.__v;
+    },
+});
 
 module.exports = mongoose.model("Person", personSchema);

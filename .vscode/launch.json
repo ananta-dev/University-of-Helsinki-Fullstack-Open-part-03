@@ -5,13 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Program",
+            "name": "Attach by Node Process ID",
+            "processId": "${command:PickProcess}",
+            "request": "attach",
+            "skipFiles": ["<node_internals>/**"],
+            "type": "node"
+        },
+        {
+            "name": "Launch node index.js with params",
             "program": "${workspaceFolder}/backend/index.js",
             "request": "launch",
             "skipFiles": ["<node_internals>/**"],
             "type": "node",
             "env": {
-                "MONGODB_URL": "mongodb+srv://fullstack:AJHaskjh187631jhkjgha192839@cluster0.fljdt.mongodb.net/noteApp?retryWrites=true&w=majority"
+                "MONGODB_URL": "mongodb+srv://fullstack:upBHpV5NvmRud4zJ@cluster0.fljdt.mongodb.net/phonebookApp?retryWrites=true&w=majority",
+                "PORT": "3001"
             }
         },
         {
