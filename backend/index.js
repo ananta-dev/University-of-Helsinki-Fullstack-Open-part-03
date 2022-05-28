@@ -35,10 +35,11 @@ app.get("/api/persons/:id", (request, response, next) => {
     const id = request.params.id;
     Person.findById(id)
         .then(person => {
-            if (person === null) {
-                throw `Person with id ${id} not found in the phonebook database`;
+            if (person) {
+                response.json(person);
+            } else {
+                response.status(404).end();
             }
-            response.json(person);
         })
         .catch(err => next(err));
 });
