@@ -1,17 +1,17 @@
 require("dotenv").config();
 const express = require("express");
-const morgan = require("morgan");
 const cors = require("cors");
+const morgan = require("morgan");
+
 const app = express();
-app.use(express.json());
 app.use(express.static("build"));
+app.use(express.json());
 app.use(cors());
+
 morgan.token("body", req => JSON.stringify(req.body));
-app.use(
-    morgan(
-        ":method :url :status :res[content-length] - :response-time ms :body"
-    )
-);
+// prettier-ignore
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body"));
+
 const Person = require("./models/person");
 
 app.get("/", (request, response) => {
@@ -42,6 +42,15 @@ app.get("/api/persons/:id", (request, response, next) => {
             }
         })
         .catch(err => next(err));
+    // .catch(err => {
+    //     if (err?.kind === "ObjectId") {
+    //         console.log("Invalid Id format");
+    //         response.status(400).send({ error: "Invalid Id format" });
+    //     } else {
+    //         console.log("Error: ", err);
+    //         response.status(500).send({ error: err });
+    //     }
+    // });
 });
 
 app.post("/api/persons", (request, response) => {
@@ -75,6 +84,36 @@ app.delete("/api/persons/:id", (request, response, next) => {
         .then(response.status(204).end())
         .catch(err => next(err));
 });
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: "Phonebook API - Unknown endpoint" });
+};
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message);
+
+    if (err?.kind === "ObjectId") {
+        console.log("Invalid Id format");
+        response.status(400).send({ error: "Invalid Id format" });
+    } else if (error?.name === "ValidationError") {
+        console.log("Validation error");
+        response.status(400).send({ error: error.message });
+    }
+
+    //     } else {
+    //         console.log("Error: ", err);
+    //         response.status(500).send({ error: err });
+    //     }
+
+    if (error.name === "CastError") {
+        return response.status(400).send({ error: "Malformatted id" });
+    } else if (error.name === "ValidationError") {
+        return response.status(400).json({ error: error.message });
+    }
+    next(error);
+};
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT);
