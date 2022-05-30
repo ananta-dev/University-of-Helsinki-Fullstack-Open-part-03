@@ -28,9 +28,10 @@ const personSchema = new mongoose.Schema({
         ],
         validate: {
             validator: function (v) {
-                return /\d{3}-\d{3}-\d{4}/.test(v);
+                return /^(\d*|\d{2,3}-\d+|\d{3}-\d{3}-\d{4})$/.test(v);
             },
-            message: props => `${props.value} is not a valid phone number!`,
+            message: props =>
+                `The phone number "${props.value}" is not in a valid format!. Please use one of the following formats: 12345678..., 12-345678..., 123-45678... or 123-456-7890.`,
         },
     },
 });
