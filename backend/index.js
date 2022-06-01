@@ -60,7 +60,9 @@ app.get("/api/persons/:id", (request, response, next) => {
             if (person) {
                 response.json(person);
             } else {
-                response.status(404).end();
+                response
+                    .status(404)
+                    .send({ error: "Entry not found with that ID" });
             }
         })
         .catch(err => {
@@ -100,10 +102,42 @@ app.post("/api/persons", (request, response, next) => {
         });
 });
 
+app.put("/api/persons/:id", (request, response, next) => {
+    const body = request.body;
+    if (!body.number) {
+        return response.status(400).json({
+            error: "number missing",
+        });
+    }
+
+    const id = request.params.id;
+
+    Person.findByIdAndUpdate(id, {
+        name: body.name,
+        number: body.number,
+    })
+        .then(updatedPerson => {
+            response.json(updatedPerson);
+        })
+        .catch(err => {
+            err.errorOrigin = "update-person";
+            next(err);
+        });
+});
+
 app.delete("/api/persons/:id", (request, response, next) => {
     const id = request.params.id;
     Person.findByIdAndRemove(id)
-        .then(response.status(204).end())
+        .then(removedEntry => {
+            if (removedEntry === null) {
+                const error = new Error(
+                    "Error attempting to delete: No entry found in the database with that ID"
+                );
+                error.code = 404;
+                throw error;
+            }
+            response.status(204).end();
+        })
         .catch(err => {
             err.errorOrigin = "delete-person";
             next(err);
@@ -124,7 +158,6 @@ app.use(unknownEndpoint);
 // **********************
 
 const errorHandler = (error, request, response, next) => {
-    console.log("Starting errorHandler. Error origin: ", error.errorOrigin);
     switch (error.errorOrigin) {
         case "get-person-by-id":
         case "delete-person":
@@ -134,24 +167,26 @@ const errorHandler = (error, request, response, next) => {
             } else if (error?.name === "ValidationError") {
                 console.log("Validation error:", error);
                 response.status(400).send({ error: error.message });
+            } else if (error?.code === 404) {
+                console.log("Entry not found.", error.message);
+                response.status(404).send({ error: error.message });
             } else {
-                console.log("Server error:", error);
+                console.log("Server error:", error.message);
                 response.status(500).send({ error: error.message });
             }
             break;
         case "post-person":
-            console.log("Database error. Code", error?.message);
             if (error?.code === 11000) {
                 console.log(
                     "Entry found in the database with the same name: ",
-                    body.name
+                    request.body.name
                 );
-                response.status(403).json(error.message);
+                response.status(403).json(error?.message);
             } else {
                 console.log(
                     "Database error while attempting to save entry to the database"
                 );
-                response.status(500).json(error.message);
+                response.status(500).json(error?.message);
             }
             break;
         case "api-root":
@@ -159,7 +194,7 @@ const errorHandler = (error, request, response, next) => {
         case "get-all-persons":
         default:
             console.log("Error: ", error);
-            console.log("Error origin: ", error.errorOrigin);
+            console.log("Error found in: ", error.errorOrigin);
             return response.status(500).json(error.message);
     }
 
