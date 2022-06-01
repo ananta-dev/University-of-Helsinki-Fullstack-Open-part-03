@@ -1,59 +1,59 @@
-require("dotenv").config();
-const express = require("express");
+require('dotenv').config();
+const express = require('express');
 const app = express();
-const cors = require("cors");
-const morgan = require("morgan");
+const cors = require('cors');
+const morgan = require('morgan');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-morgan.token("body", req => JSON.stringify(req.body));
+morgan.token('body', req => JSON.stringify(req.body));
 // prettier-ignore
-app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body"));
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 // Frontend build
-app.use(express.static("build"));
+app.use(express.static('build'));
 
 // Mongoose person collection model
-const Person = require("./models/person");
+const Person = require('./models/person');
 
 // ********************
 // ***    ROUTES    ***
 // ********************
 
-app.get("/", (request, response, next) => {
+app.get('/', (request, response, next) => {
     try {
-        response.send("<h2>Phonebook API running</h2>");
+        response.send('<h2>Phonebook API running</h2>');
     } catch (err) {
-        err.errorOrigin = "api-root";
+        err.errorOrigin = 'api-root';
         next(err);
     }
 });
 
-app.get("/info", (request, response, next) => {
+app.get('/info', (request, response, next) => {
     try {
         response.send(
             `<p>Phonebook is an API for the management of a list of people and their phone numbers</p>
         <p>${new Date()}</p>`
         );
     } catch (err) {
-        err.errorOrigin = "get-info";
+        err.errorOrigin = 'get-info';
         next(err);
     }
 });
 
-app.get("/api/persons", (request, response, next) => {
+app.get('/api/persons', (request, response, next) => {
     Person.find({})
         .then(persons => {
             response.json(persons);
         })
         .catch(err => {
-            err.errorOrigin = "get-all-persons";
+            err.errorOrigin = 'get-all-persons';
             next(err);
         });
 });
 
-app.get("/api/persons/:id", (request, response, next) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id;
     Person.findById(id)
         .then(person => {
@@ -62,27 +62,27 @@ app.get("/api/persons/:id", (request, response, next) => {
             } else {
                 response
                     .status(404)
-                    .send({ error: "Entry not found with that ID" });
+                    .send({ error: 'Entry not found with that ID' });
             }
         })
         .catch(err => {
-            err.errorOrigin = "get-person-by-id";
+            err.errorOrigin = 'get-person-by-id';
             next(err);
         });
 });
 
-app.post("/api/persons", (request, response, next) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body;
 
     if (!body.name) {
         return response.status(400).json({
-            error: "name missing",
+            error: 'name missing',
         });
     }
 
     if (!body.number) {
         return response.status(400).json({
-            error: "number missing",
+            error: 'number missing',
         });
     }
 
@@ -97,16 +97,16 @@ app.post("/api/persons", (request, response, next) => {
             response.json(savedPerson);
         })
         .catch(err => {
-            err.errorOrigin = "post-person";
+            err.errorOrigin = 'post-person';
             next(err);
         });
 });
 
-app.put("/api/persons/:id", (request, response, next) => {
+app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body;
     if (!body.number) {
         return response.status(400).json({
-            error: "number missing",
+            error: 'number missing',
         });
     }
 
@@ -118,24 +118,24 @@ app.put("/api/persons/:id", (request, response, next) => {
             name: body.name,
             number: body.number,
         },
-        { runValidators: true, context: "query" }
+        { runValidators: true, context: 'query' }
     )
         .then(updatedPerson => {
             response.json(updatedPerson);
         })
         .catch(err => {
-            err.errorOrigin = "update-person";
+            err.errorOrigin = 'update-person';
             next(err);
         });
 });
 
-app.delete("/api/persons/:id", (request, response, next) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     const id = request.params.id;
     Person.findByIdAndRemove(id)
         .then(removedEntry => {
             if (removedEntry === null) {
                 const error = new Error(
-                    "Error attempting to delete: No entry found in the database with that ID"
+                    'Error attempting to delete: No entry found in the database with that ID'
                 );
                 error.code = 404;
                 throw error;
@@ -143,7 +143,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
             response.status(204).end();
         })
         .catch(err => {
-            err.errorOrigin = "delete-person";
+            err.errorOrigin = 'delete-person';
             next(err);
         });
 });
@@ -153,7 +153,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
 // *********************
 
 const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: "Phonebook API - Unknown endpoint" });
+    response.status(404).send({ error: 'Phonebook API - Unknown endpoint' });
 };
 app.use(unknownEndpoint);
 
@@ -163,46 +163,46 @@ app.use(unknownEndpoint);
 
 const errorHandler = (error, request, response, next) => {
     switch (error.errorOrigin) {
-        case "get-person-by-id":
-        case "delete-person":
-        case "update-person":
-            if (error?.kind === "ObjectId") {
-                console.log("Invalid Id format");
-                response.status(400).send({ error: "Invalid Id format" });
-            } else if (error?.name === "ValidationError") {
-                console.log("Validation error:", error);
+        case 'get-person-by-id':
+        case 'delete-person':
+        case 'update-person':
+            if (error?.kind === 'ObjectId') {
+                console.log('Invalid Id format');
+                response.status(400).send({ error: 'Invalid Id format' });
+            } else if (error?.name === 'ValidationError') {
+                console.log('Validation error:', error);
                 response.status(400).send({ error: error.message });
             } else if (error?.code === 404) {
-                console.log("Entry not found.", error.message);
+                console.log('Entry not found.', error.message);
                 response.status(404).send({ error: error.message });
             } else {
-                console.log("Server error:", error.message);
+                console.log('Server error:', error.message);
                 response.status(500).send({ error: error.message });
             }
             break;
-        case "post-person":
+        case 'post-person':
             if (error?.code === 11000) {
                 console.log(
-                    "Entry found in the database with the same name: ",
+                    'Entry found in the database with the same name: ',
                     request.body.name
                 );
                 response.status(403).json(error?.message);
-            } else if (error?.name === "ValidationError") {
-                console.log("Validation error:", error);
+            } else if (error?.name === 'ValidationError') {
+                console.log('Validation error:', error);
                 response.status(400).send({ error: error.message });
             } else {
                 console.log(
-                    "Database error while attempting to save new entry to the database"
+                    'Database error while attempting to save new entry to the database'
                 );
                 response.status(500).json(error?.message);
             }
             break;
-        case "api-root":
-        case "get-info":
-        case "get-all-persons":
+        case 'api-root':
+        case 'get-info':
+        case 'get-all-persons':
         default:
-            console.log("Error: ", error);
-            console.log("Error found in: ", error.errorOrigin);
+            console.log('Error: ', error);
+            console.log('Error found in: ', error.errorOrigin);
             return response.status(500).json(error.message);
     }
 
