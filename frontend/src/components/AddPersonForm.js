@@ -27,14 +27,9 @@ const AddPersonForm = ({
             ) {
                 const entryToUpdate = persons.find(p => p.name === newName);
                 const updatedEntry = { ...entryToUpdate, number: newNumber };
-                // console.log("replacing phonebook Entry:", entryToUpdate);
-                // console.log("New data:", updatedEntry);
-
                 phonebookService
                     .updateEntry(updatedEntry)
                     .then(response => {
-                        // console.log("Response from updateEntry", response);
-
                         setPersons(
                             persons.map(p => {
                                 if (p.id === updatedEntry.id) {
@@ -55,11 +50,11 @@ const AddPersonForm = ({
                         setIsError(false);
                         setMessage(`Updated ${newName}'s number`);
                     })
-                    .catch(error => {
+                    .catch(err => {
                         // do something with error
                         setIsError(true);
                         setMessage(
-                            `Error while attempting to update ${newName}. Entry with name "${newName}" not found on the server. The entry may have been deleted by another user. Please refresh this page to view an updated list of phonebook entries on the server.`
+                            `Error while attempting to update ${newName}. ${err?.response.data.error}`
                         );
                     });
             }
@@ -70,16 +65,26 @@ const AddPersonForm = ({
                 name: newName,
                 number: newNumber,
             };
-            phonebookService.addEntry(newPerson).then(response => {
-                const newPersonsArray = [...persons, response.data];
-                setPersons(newPersonsArray);
-                setPersonsToShow(newPersonsArray);
-                setFilterString("");
-                setNewName("");
-                setNewNumber("");
-            });
-            setIsError(false);
-            setMessage(`Added ${newName}`);
+
+            phonebookService
+                .addEntry(newPerson)
+                .then(response => {
+                    const newPersonsArray = [...persons, response.data];
+                    setPersons(newPersonsArray);
+                    setPersonsToShow(newPersonsArray);
+                    setFilterString("");
+                    setNewName("");
+                    setNewNumber("");
+                    setIsError(false);
+                    setMessage(`Added ${newName}`);
+                })
+                .catch(err => {
+                    console.log({ err });
+                    setIsError(true);
+                    setMessage(
+                        `Error while attempting to save ${newName}. ${err?.response.data.error} `
+                    );
+                });
         }
     };
 

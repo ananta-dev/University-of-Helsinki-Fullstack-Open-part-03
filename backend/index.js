@@ -112,10 +112,14 @@ app.put("/api/persons/:id", (request, response, next) => {
 
     const id = request.params.id;
 
-    Person.findByIdAndUpdate(id, {
-        name: body.name,
-        number: body.number,
-    })
+    Person.findByIdAndUpdate(
+        id,
+        {
+            name: body.name,
+            number: body.number,
+        },
+        { runValidators: true, context: "query" }
+    )
         .then(updatedPerson => {
             response.json(updatedPerson);
         })
@@ -161,6 +165,7 @@ const errorHandler = (error, request, response, next) => {
     switch (error.errorOrigin) {
         case "get-person-by-id":
         case "delete-person":
+        case "update-person":
             if (error?.kind === "ObjectId") {
                 console.log("Invalid Id format");
                 response.status(400).send({ error: "Invalid Id format" });
@@ -182,9 +187,12 @@ const errorHandler = (error, request, response, next) => {
                     request.body.name
                 );
                 response.status(403).json(error?.message);
+            } else if (error?.name === "ValidationError") {
+                console.log("Validation error:", error);
+                response.status(400).send({ error: error.message });
             } else {
                 console.log(
-                    "Database error while attempting to save entry to the database"
+                    "Database error while attempting to save new entry to the database"
                 );
                 response.status(500).json(error?.message);
             }
